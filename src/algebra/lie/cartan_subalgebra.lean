@@ -43,7 +43,7 @@ def normalizer : lie_subalgebra R L :=
 lemma mem_normalizer_iff (x : L) : x ∈ H.normalizer ↔ ∀ (y : L), (y ∈ H) → ⁅x, y⁆ ∈ H := iff.rfl
 
 lemma mem_normalizer_iff' (x : L) : x ∈ H.normalizer ↔ ∀ (y : L), (y ∈ H) → ⁅y, x⁆ ∈ H :=
-forall_congr (λ y, forall_congr (λ hy, by rw [← lie_skew, H.neg_mem_iff]))
+forall₂_congr $ λ y hy, by rw [← lie_skew, H.neg_mem_iff]
 
 lemma le_normalizer : H ≤ H.normalizer :=
 λ x hx, show ∀ (y : L), y ∈ H → ⁅x,y⁆ ∈ H, from λ y, H.lie_mem hx
@@ -70,6 +70,8 @@ lemma le_normalizer_of_ideal {N : lie_subalgebra R L}
   (h : ∀ (x y : L), x ∈ N → y ∈ H → ⁅x,y⁆ ∈ H) : N ≤ H.normalizer :=
 λ x hx y, h x y hx
 
+variables (H)
+
 lemma normalizer_eq_self_iff :
   H.normalizer = H ↔ (lie_module.max_triv_submodule R H $ L ⧸ H.to_lie_submodule) = ⊥ :=
 begin
@@ -89,8 +91,6 @@ begin
       exact (H.mem_normalizer_iff' x).mp hx z hz, },
     simpa using h y hy, },
 end
-
-variables (H)
 
 /-- A Cartan subalgebra is a nilpotent, self-normalizing subalgebra. -/
 class is_cartan_subalgebra : Prop :=
