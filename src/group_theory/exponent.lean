@@ -19,7 +19,8 @@ it is equal to the lowest common multiple of the order of all elements of the gr
 ## Main definitions
 
 * `monoid.exponent_exists` is a predicate on a monoid `G` saying that there is some positive `n`
-  such that `g ^ n = 1` for all `g ∈ G`.
+  such that `g ^ n = 1` for all `g ∈ G`. Equivalent terminology is that `G` is a torsion group, or
+  periodic group.
 * `monoid.exponent` defines the exponent of a monoid `G` as the minimal positive `n` such that
   `g ^ n = 1` for all `g ∈ G`, by convention it is `0` if no such `n` exists.
 * `add_monoid.exponent_exists` the additive version of `monoid.exponent_exists`.
@@ -52,7 +53,7 @@ variables (G) [monoid G]
   for all `g`.-/
 @[to_additive "A predicate on an additive monoid saying that there is a positive integer `n` such
   that `n • g = 0` for all `g`."]
-def exponent_exists  := ∃ n, 0 < n ∧ ∀ g : G, g ^ n = 1
+def exponent_exists := ∃ n, 0 < n ∧ ∀ g : G, g ^ n = 1
 
 /--The exponent of a group is the smallest positive integer `n` such that `g ^ n = 1` for all
   `g ∈ G` if it exists, otherwise it is zero by convention.-/
