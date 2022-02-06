@@ -18,12 +18,12 @@ it is equal to the lowest common multiple of the order of all elements of the gr
 
 ## Main definitions
 
-* `monoid.exponent_exists` is a predicate on a monoid `G` saying that there is some positive `n`
-  such that `g ^ n = 1` for all `g ∈ G`. Equivalent terminology is that `G` is a torsion group, or
-  periodic group.
-* `monoid.exponent` defines the exponent of a monoid `G` as the minimal positive `n` such that
-  `g ^ n = 1` for all `g ∈ G`, by convention it is `0` if no such `n` exists.
-* `add_monoid.exponent_exists` the additive version of `monoid.exponent_exists`.
+* `monoid.is_torsion` is a predicate asserting a monoid `G` is a torsion monoid, i.e. that there
+  is some positive `n` such that `g ^ n = 1` for all `g ∈ G`. Torsion groups are also known as
+  periodic groups.
+* `monoid.exponent` defines the exponent of a monoid `G` as the minimal positive `n` such
+  that `g ^ n = 1` for all `g ∈ G`. By convention it is `0` if `G` is not a torsion monoid.
+* `add_monoid.is_torsion` the additive version of `monoid.is_torsion`.
 * `add_monoid.exponent` the additive version of `monoid.exponent`.
 
 ## Main results
@@ -53,19 +53,40 @@ variables (G) [monoid G]
   for all `g`.-/
 @[to_additive "A predicate on an additive monoid saying that there is a positive integer `n` such
   that `n • g = 0` for all `g`."]
-def exponent_exists := ∃ n, 0 < n ∧ ∀ g : G, g ^ n = 1
+def is_torsion := ∃ n, 0 < n ∧ ∀ g : G, g ^ n = 1
+
+end monoid
+
+namespace is_torsion
+
+variables [group G]
+
+/--Normal subgroups of torsion groups are torsion groups. -/
+@[to_additive "Normal subgroups of additive torsion groups are additive torsion groups."]
+lemma of_subgroup (hG : is_torsion G) {H : subgroup G} : is_torsion H := begin
+  obtain ⟨n, ⟨npos, hn⟩⟩ := hG,
+  use n,
+  refine ⟨npos, λ g, subtype.coe_injective _⟩,
+  rw [subgroup.coe_pow, subgroup.coe_one, hn _],
+end
+
+end is_torsion
+
+section monoid
+
+variables (G) [monoid G]
 
 /--The exponent of a group is the smallest positive integer `n` such that `g ^ n = 1` for all
   `g ∈ G` if it exists, otherwise it is zero by convention.-/
 @[to_additive "The exponent of an additive group is the smallest positive integer `n` such that
   `n • g = 0` for all `g ∈ G` if it exists, otherwise it is zero by convention."]
 noncomputable def exponent :=
-if h : exponent_exists G then nat.find h else 0
+if h : is_torsion G then nat.find h else 0
 
 variable {G}
 
 @[to_additive]
-lemma exponent_eq_zero_iff : exponent G = 0 ↔ ¬ exponent_exists G :=
+lemma exponent_eq_zero_iff : exponent G = 0 ↔ ¬ is_torsion G :=
 begin
   rw [exponent],
   split_ifs,
@@ -80,7 +101,7 @@ exponent_eq_zero_iff.mpr $ λ ⟨n, hn, hgn⟩, order_of_eq_zero_iff'.mp hg n hn
 @[to_additive exponent_nsmul_eq_zero]
 lemma pow_exponent_eq_one (g : G) : g ^ exponent G = 1 :=
 begin
-  by_cases exponent_exists G,
+  by_cases is_torsion G,
   { simp_rw [exponent, dif_pos h],
     exact (nat.find_spec h).2 g },
   { simp_rw [exponent, dif_neg h, pow_zero] }
